@@ -11,10 +11,10 @@ const App = () => {
         <Route exact path="/">
           <Home />
         </Route>
-        <Route path="/add">
+        <Route path="/projects/add">
           <Add />
         </Route>
-        <Route path="/edit">
+        <Route path="/projects/edit">
           <Edit />
         </Route>
       </Switch>

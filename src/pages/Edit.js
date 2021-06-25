@@ -1,7 +1,8 @@
 import React from "react";
+import Navbar from "../components/Navbar";
 
 const Edit = () => {
-  return <div>Edit</div>;
+  return <Navbar />;
 };
 
 export default Edit;
