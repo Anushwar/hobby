@@ -1,15 +1,19 @@
 import React, { StrictMode } from "react";
 import ReactDOM from "react-dom";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import { Provider } from "react-redux";
 import theme from "./theme";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import store from "./redux";
 
 ReactDOM.render(
   <StrictMode>
     <ChakraProvider theme={theme}>
       <ColorModeScript initialcolormode="light" />
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </ChakraProvider>
   </StrictMode>,
   document.getElementById("root")

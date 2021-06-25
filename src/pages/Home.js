@@ -3,10 +3,13 @@ import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { Text, Flex, Heading, Button, Spacer } from "@chakra-ui/react";
 import { Link, useHistory } from "react-router-dom";
+import { FiPlus } from "react-icons/fi";
+import { useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
 
 const GridContainer = styled.div({
   display: "grid",
+  padding: "1rem",
   columnGap: 20,
   rowGap: 20,
   alignItems: "center",
@@ -19,10 +22,12 @@ const ClassContainer = styled.div(({ theme }) => {
   return {
     width: "100%",
     display: "flex",
+    minHeight: 150,
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
     borderRadius: radii.lg,
-    border: `0.1px solid ${colors.gray[400]}`,
+    border: `0.1px solid ${colors.gray[300]}`,
     userSelect: "none",
     padding: "1rem 0",
     textAlign: "center",
@@ -36,6 +41,7 @@ const ClassContainer = styled.div(({ theme }) => {
   };
 });
 const Home = () => {
+  const hobbies = useSelector(({ hobbyData }) => hobbyData.hobbies);
   const [projects, setProjects] = useState([
     { title: "My Project 1", description: "Ths is a sample text" },
     { title: "My Project 2", description: "Ths is a sample text" },
@@ -47,30 +53,19 @@ const Home = () => {
   return (
     <>
       <Navbar />
-      <Flex
-        align="center"
-        justify="space-between"
-        direction="row"
-        wrap="no-wrap"
-        height="5rem"
-        px={8}
-        mt={10}
-      >
-        <Spacer />
-        <Button colorScheme="red" onClick={() => history.push(`/projects/add`)}>
-          Add Project
-        </Button>
-      </Flex>
       <GridContainer>
-        {projects &&
-          projects.map((project) => (
+        {hobbies &&
+          hobbies.map((hobby, index) => (
             <ClassContainer
-              onClick={() => history.push(`/projects/${project.title}`)}
+              onClick={() => history.push(`/projects/${index}/view`)}
             >
-              <Text>{project.title}</Text>
-              <Text fontSize="sm">{project.description}</Text>
+              <Heading size="md">{hobby.title}</Heading>
+              <Text fontSize="sm">{hobby.desc}</Text>
             </ClassContainer>
           ))}
+        <ClassContainer onClick={() => history.push(`/projects/add`)}>
+          <FiPlus size={30} />
+        </ClassContainer>
       </GridContainer>
     </>
   );
