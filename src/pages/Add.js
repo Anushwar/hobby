@@ -5,11 +5,15 @@ import {
   Input,
   FormControl,
   Container,
-  Text,
   Textarea,
+  Heading,
 } from "@chakra-ui/react";
 import styled from "@emotion/styled";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+// import { useHistory } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { addHobbyDispatch } from "../redux/triggers/hobbies";
 
 const Form = styled.form({
   display: "inline-flex",
@@ -18,30 +22,47 @@ const Form = styled.form({
 });
 
 const Add = () => {
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+
+  const dispatch = useDispatch();
+  // const history = useHistory();
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+    try {
+      addHobbyDispatch({
+        title,
+        desc,
+      })(dispatch);
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
   return (
     <>
       <Navbar />
       <Container centerContent alignItems="center" w="100%" maxW="325" mt={50}>
-        <Text>Enter your project details</Text>
-        <Form noValidate>
-          <FormControl>
+        <Heading fontSize="lg">Enter your project details</Heading>
+        <Form onSubmit={handleSubmit}>
+          <FormControl mt="2rem">
             <Input
               name="project"
               id="project"
               placeholder="Enter your Project title"
+              onChange={(e) => setTitle(e.target.value)}
               autoFocus
             />
           </FormControl>
           <FormControl mt="1rem">
             <Textarea
-              id="password"
-              name="password"
-              type="textarea"
+              id="desc"
+              name="desc"
               placeholder="Enter your project description here."
+              onChange={(e) => setDesc(e.target.value)}
               isRequired
             />
           </FormControl>
-          <Button type="submit" appearance="primary" mt="40px" width="100%">
+          <Button type="subtmit" appearance="primary" mt="40px" width="100%">
             Add new project.
           </Button>
         </Form>
