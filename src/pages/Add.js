@@ -98,7 +98,6 @@ const Add = () => {
       return;
     }
     const { files } = e.target;
-    console.log(files, "bruh");
     if (mode === MODE.EDIT) {
       setNewImages([...newImages, ...files]);
     } else {
