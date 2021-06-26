@@ -1,17 +1,6 @@
 /** @jsxImportSource @emotion/react */
-/* eslint-disable no-unused-vars */
-
-import { useState } from "react";
 import styled from "@emotion/styled";
-import {
-  Text,
-  Flex,
-  Heading,
-  Button,
-  Spacer,
-  CloseButton,
-  Box,
-} from "@chakra-ui/react";
+import { Text, CloseButton, Box } from "@chakra-ui/react";
 import { Link, useHistory } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
@@ -30,28 +19,6 @@ const GridContainer = styled.div({
   gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
   marginTop: "2rem",
 });
-const ClassContainer = styled.div(({ theme }) => {
-  const { transition, colors, radii } = theme;
-  return {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: radii.lg,
-    border: `0.1px solid ${colors.gray[300]}`,
-    userSelect: "none",
-    padding: "1rem 0",
-    textAlign: "center",
-    cursor: "pointer",
-    transition: `all ${transition.duration.normal} ease`,
-    "&:hover": {
-      transform: "translateY(-3px)",
-      boxShadow:
-        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    },
-  };
-});
 
 const ProjectBox = styled(Box)(({ theme }) => {
   const { colors, transition, radii } = theme;
@@ -69,6 +36,7 @@ const ProjectBox = styled(Box)(({ theme }) => {
     },
   };
 });
+
 const Home = () => {
   const projects = useSelector(({ projectsData }) => projectsData.projects);
   const { colors } = useTheme();
@@ -91,10 +59,10 @@ const Home = () => {
         {projects &&
           projects.map(({ title, images }, index) => (
             <ProjectBox
-              as={Link}
               key={`${title}-${uuid()}`}
               position="relative"
-              to={`projects/${index}`}
+              cursor="pointer"
+              onClick={() => history.push(`projects/${index}`)}
             >
               <CloseButton
                 top="5px"
@@ -103,7 +71,10 @@ const Home = () => {
                 _hover={{
                   background: colors.gray[200],
                 }}
-                onClick={() => onDelete(index)}
+                onClick={(e) => {
+                  onDelete(index);
+                  e.stopPropagation();
+                }}
               />
               {images[0] && (
                 <img

@@ -11,13 +11,16 @@ import {
   FormLabel,
   FormErrorMessage,
   Grid,
+  Box,
+  Image,
+  CloseButton,
+  useTheme,
 } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import { useHistory } from "react-router-dom";
 import { uuid } from "uuidv4";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { storage } from "../firebase";
 import Navbar from "../components/Navbar";
 import {
@@ -31,9 +34,31 @@ const Form = styled.form({
   width: "100%",
 });
 
+const ImageBox = styled(Box)(({ theme }) => {
+  const { colors, transition, radii } = theme;
+  return {
+    minHeight: 150,
+    width: "100%",
+    border: `0.1px solid ${colors.gray[300]}`,
+    borderRadius: radii.lg,
+    overflow: "hidden",
+    transition: `all ${transition.duration.normal} ease`,
+    "&:hover": {
+      transform: "translateY(-3px)",
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    },
+  };
+});
+
 const MODE = {
   ADD: "add",
   EDIT: "edit",
+};
+
+const DELETE_TYPE = {
+  UPLOAD: "UPLOAD",
+  NEW: "NEW",
 };
 
 const Add = () => {
@@ -66,13 +91,14 @@ const Add = () => {
   const imageUploadRef = useRef(null);
   const toast = useToast();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const { colors } = useTheme();
 
   const handleChange = (e) => {
     if (!e.target?.files) {
       return;
     }
     const { files } = e.target;
+    console.log(files, "bruh");
     if (mode === MODE.EDIT) {
       setNewImages([...newImages, ...files]);
     } else {
@@ -160,8 +186,28 @@ const Add = () => {
         }
       }
     }
-    history.go(-1);
+    // history.go(-1);
     setLoading(false);
+  };
+
+  const onDelete = (type, deleteIndex) => {
+    switch (type) {
+      case DELETE_TYPE.ADD: {
+        const imagesModifed = [...images];
+        imagesModifed.splice(deleteIndex, 1);
+        setImages(imagesModifed);
+        break;
+      }
+      case DELETE_TYPE.NEW: {
+        const imagesModifed = [...newImages];
+        imagesModifed.splice(deleteIndex, 1);
+        setNewImages(imagesModifed);
+        break;
+      }
+      default: {
+        //
+      }
+    }
   };
   return (
     <>
@@ -232,29 +278,57 @@ const Add = () => {
           mt="5"
           gap="2"
         >
-          {images.map((image) => {
+          {images.map((image, imageIndex) => {
             return (
-              <img
-                src={
-                  // eslint-disable-next-line no-nested-ternary
-                  image
-                    ? mode === MODE.EDIT
-                      ? image
-                      : URL.createObjectURL(image)
-                    : null
-                }
-                key={image.name}
-                alt={image.name}
-              />
+              <ImageBox key={image.name} position="relative">
+                <CloseButton
+                  top="5px"
+                  right="5px"
+                  position="absolute"
+                  _hover={{
+                    background: colors.gray[100],
+                  }}
+                  background="gray.300"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(DELETE_TYPE.ADD, imageIndex);
+                  }}
+                />
+                <Image
+                  src={
+                    // eslint-disable-next-line no-nested-ternary
+                    image
+                      ? mode === MODE.EDIT
+                        ? image
+                        : URL.createObjectURL(image)
+                      : null
+                  }
+                  alt={image.name}
+                />
+              </ImageBox>
             );
           })}
-          {newImages.map((image) => {
+          {newImages.map((image, imageIndex) => {
             return (
-              <img
-                src={image ? URL.createObjectURL(image) : null}
-                key={image.name}
-                alt={image.name}
-              />
+              <ImageBox key={image.name} position="relative">
+                <CloseButton
+                  top="5px"
+                  right="5px"
+                  position="absolute"
+                  _hover={{
+                    background: colors.gray[100],
+                  }}
+                  background="gray.300"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(DELETE_TYPE.NEW, imageIndex);
+                  }}
+                />
+                <Image
+                  src={image ? URL.createObjectURL(image) : null}
+                  alt={image.name}
+                />
+              </ImageBox>
             );
           })}
         </Grid>

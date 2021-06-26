@@ -44,9 +44,11 @@ const ProjectDetails = () => {
         <Text color="gray.500" my="10">
           {desc}
         </Text>
-        <Heading size="mdd" my="2">
-          Images:
-        </Heading>
+        {images && images.length !== 0 && (
+          <Heading size="md" my="2">
+            Images:
+          </Heading>
+        )}
         <Stack>
           {images.map((image) => {
             return (
