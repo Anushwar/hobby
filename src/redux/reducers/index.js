@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
-import hobbyReducer from "./hobbies";
+import projectReducer from "./project";
 
 const reducer = combineReducers({
-  hobbyData: hobbyReducer,
+  projectsData: projectReducer,
 });
 
 export default reducer;

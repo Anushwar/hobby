@@ -41,7 +41,7 @@ const ClassContainer = styled.div(({ theme }) => {
   };
 });
 const Home = () => {
-  const hobbies = useSelector(({ hobbyData }) => hobbyData.hobbies);
+  const hobbies = useSelector(({ projectsData }) => projectsData.projects);
   const [projects, setProjects] = useState([
     { title: "My Project 1", description: "Ths is a sample text" },
     { title: "My Project 2", description: "Ths is a sample text" },

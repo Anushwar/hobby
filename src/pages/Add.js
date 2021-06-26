@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 // import { useHistory } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { addHobbyDispatch } from "../redux/triggers/hobbies";
+import { addProjectDispatch } from "../redux/triggers/project";
 
 const Form = styled.form({
   display: "inline-flex",
@@ -30,7 +30,7 @@ const Add = () => {
   const handleSubmit = (evt) => {
     evt.preventDefault();
     try {
-      addHobbyDispatch({
+      addProjectDispatch({
         title,
         desc,
       })(dispatch);
