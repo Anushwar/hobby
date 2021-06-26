@@ -6,7 +6,9 @@ export default (state = { projects: [] }, action) => {
       return { ...state, projects: [...state.projects, action.project] };
     }
     case DELETE_PROJECT: {
-      return { ...state, projects: state.projects.splice(action.index, 1) };
+      const projects = [...state.projects];
+      projects.splice(action.index, 1);
+      return { ...state, projects };
     }
     default: {
       return { ...state };
