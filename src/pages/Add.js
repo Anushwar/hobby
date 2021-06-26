@@ -17,10 +17,13 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // import { useHistory } from "react-router-dom";
 import { uuid } from "uuidv4";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { storage } from "../firebase";
 import Navbar from "../components/Navbar";
-import { addProjectDispatch } from "../redux/triggers/project";
+import {
+  addProjectDispatch,
+  updateProjectDispatch,
+} from "../redux/triggers/project";
 
 const Form = styled.form({
   display: "inline-flex",
@@ -41,6 +44,7 @@ const Add = () => {
   const [descValid, setDescValid] = useState(true);
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
   const { index } = useParams();
   const project = useSelector(
     ({ projectsData }) => index && projectsData.projects[index]
@@ -50,6 +54,7 @@ const Add = () => {
       if (project) {
         setTitle(project.title);
         setDesc(project.desc);
+        setImages(project.images);
         setMode(MODE.EDIT);
       } else {
         setMode(MODE.ADD);
@@ -61,13 +66,18 @@ const Add = () => {
   const imageUploadRef = useRef(null);
   const toast = useToast();
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const handleChange = (e) => {
     if (!e.target?.files) {
       return;
     }
     const { files } = e.target;
-    setImages([...images, ...files]);
+    if (mode === MODE.EDIT) {
+      setNewImages([...newImages, ...files]);
+    } else {
+      setImages([...images, ...files]);
+    }
   };
   const handleSubmit = async (evt) => {
     evt.preventDefault();
@@ -79,43 +89,87 @@ const Add = () => {
     } else {
       setTitleValid(true);
       setDescValid(true);
-      try {
-        const imagesTask = await Promise.all(
-          images.map((image) =>
-            storage.ref().child(`images/${uuid()}`).put(image)
-          )
-        );
-        const imagesURL = await Promise.all(
-          imagesTask.map((snapshot) => snapshot.ref.getDownloadURL())
-        );
-        addProjectDispatch({
-          title,
-          desc,
-          images: imagesURL,
-        })(dispatch);
-        toast({
-          title: "Project created.",
-          description: `Created a new Project "${title}"`,
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-      } catch (e) {
-        toast({
-          title: `Error occured`,
-          description: e.message ? e.message : "Unknown error",
-          status: "error",
-          isClosable: true,
-        });
+      switch (mode) {
+        case MODE.ADD: {
+          try {
+            const imagesTask = await Promise.all(
+              images.map((image) =>
+                storage.ref().child(`images/${uuid()}`).put(image)
+              )
+            );
+            const imagesURL = await Promise.all(
+              imagesTask.map((snapshot) => snapshot.ref.getDownloadURL())
+            );
+            addProjectDispatch({
+              title,
+              desc,
+              images: imagesURL,
+            })(dispatch);
+            toast({
+              title: "Project created.",
+              description: `Created a new Project "${title}"`,
+              status: "success",
+              duration: 9000,
+              isClosable: true,
+            });
+          } catch (e) {
+            toast({
+              title: `Error occured`,
+              description: e.message ? e.message : "Unknown error",
+              status: "error",
+              isClosable: true,
+            });
+          }
+          break;
+        }
+        case MODE.EDIT: {
+          try {
+            const imagesTask = await Promise.all(
+              newImages.map((image) =>
+                storage.ref().child(`images/${uuid()}`).put(image)
+              )
+            );
+            const imagesURL = await Promise.all(
+              imagesTask.map((snapshot) => snapshot.ref.getDownloadURL())
+            );
+            updateProjectDispatch(index, {
+              title,
+              desc,
+              images: [...images, ...imagesURL],
+            })(dispatch);
+            setNewImages([]);
+            toast({
+              title: "Project Updated.",
+              description: `Update Project "${title}"`,
+              status: "success",
+              duration: 9000,
+              isClosable: true,
+            });
+          } catch (e) {
+            toast({
+              title: "Error occured",
+              description: e.message ? e.message : "Unknown error",
+              status: "error",
+              isClosable: true,
+            });
+          }
+          break;
+        }
+        default: {
+          //
+        }
       }
     }
+    history.go(-1);
     setLoading(false);
   };
   return (
     <>
       <Navbar />
-      <Container alignItems="center" w="100%" maxW="700" mt={50}>
-        <Heading>Enter your project details:</Heading>
+      <Container alignItems="center" w="100%" maxW="700" my={50}>
+        <Heading>
+          {mode === MODE.EDIT ? "Edit" : "Add"} your project details:
+        </Heading>
         <Form onSubmit={handleSubmit} noValidate>
           <FormControl mt="2rem" isInvalid={!titleValid}>
             <FormLabel htmlFor="project">Project Name</FormLabel>
@@ -168,11 +222,33 @@ const Add = () => {
             {mode === MODE.EDIT ? "Update Project" : "Add a Project"}
           </Button>
         </Form>
-        <Heading size="l" mt="5" mb="3">
-          Image Preview:
-        </Heading>
-        <Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))" mt="5">
+        {images && images.length !== 0 && (
+          <Heading size="l" mt="5" mb="3">
+            Image Preview:
+          </Heading>
+        )}
+        <Grid
+          templateColumns="repeat(auto-fill, minmax(325px, 1fr))"
+          mt="5"
+          gap="2"
+        >
           {images.map((image) => {
+            return (
+              <img
+                src={
+                  // eslint-disable-next-line no-nested-ternary
+                  image
+                    ? mode === MODE.EDIT
+                      ? image
+                      : URL.createObjectURL(image)
+                    : null
+                }
+                key={image.name}
+                alt={image.name}
+              />
+            );
+          })}
+          {newImages.map((image) => {
             return (
               <img
                 src={image ? URL.createObjectURL(image) : null}
