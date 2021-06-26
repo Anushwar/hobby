@@ -2,8 +2,7 @@
 /** @jsxImportSource */
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Add from "./pages/Add";
-import CardDetails from "./pages/CardDetails";
-import Edit from "./pages/Edit";
+import CardDetails from "./pages/ProjectDetails";
 import Home from "./pages/Home";
 
 const App = () => {
@@ -11,11 +10,8 @@ const App = () => {
     <Router>
       <Switch>
         <Route exact path="/" component={Home} />
-
-        <Route path="/projects/add" component={Add} />
-
-        <Route path="/projects/edit" component={Edit} />
-        <Route path="/projects/:index/(view|edit)" component={CardDetails} />
+        <Route path="/projects/add/:index?" component={Add} />
+        <Route path="/projects/:index" component={CardDetails} />
       </Switch>
     </Router>
   );
