@@ -1,5 +1,7 @@
+/** @jsxImportSource @emotion/react */
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+
+import { useState } from "react";
 import styled from "@emotion/styled";
 import {
   Text,
@@ -87,8 +89,13 @@ const Home = () => {
       <Navbar />
       <GridContainer>
         {projects &&
-          projects.map(({ title, images, desc }, index) => (
-            <ProjectBox key={`${title}-${uuid()}`} position="relative">
+          projects.map(({ title, images }, index) => (
+            <ProjectBox
+              as={Link}
+              key={`${title}-${uuid()}`}
+              position="relative"
+              to={`projects/${index}`}
+            >
               <CloseButton
                 top="5px"
                 right="5px"
@@ -102,7 +109,11 @@ const Home = () => {
                 <img
                   alt={title}
                   src={images[0]}
-                  css={{ overflow: "hidden", height: "90%" }}
+                  css={{
+                    overflow: "hidden",
+                    height: "140px",
+                    width: "100%",
+                  }}
                 />
               )}
               <Text fontSize="md" my={2} mx={3} color="gray.600">
@@ -111,7 +122,8 @@ const Home = () => {
             </ProjectBox>
           ))}
         <ProjectBox
-          onClick={() => history.push(`/projects/add`)}
+          as={Link}
+          to="projects/add"
           css={{
             height: "100%",
             display: "flex",

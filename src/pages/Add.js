@@ -13,10 +13,11 @@ import {
   Grid,
 } from "@chakra-ui/react";
 import styled from "@emotion/styled";
-import { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 // import { useHistory } from "react-router-dom";
 import { uuid } from "uuidv4";
+import { useParams } from "react-router-dom";
 import { storage } from "../firebase";
 import Navbar from "../components/Navbar";
 import { addProjectDispatch } from "../redux/triggers/project";
@@ -27,14 +28,36 @@ const Form = styled.form({
   width: "100%",
 });
 
+const MODE = {
+  ADD: "add",
+  EDIT: "edit",
+};
+
 const Add = () => {
+  const [mode, setMode] = useState(MODE.ADD);
   const [title, setTitle] = useState("");
   const [titleValid, setTitleValid] = useState(true);
   const [desc, setDesc] = useState("");
   const [descValid, setDescValid] = useState(true);
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
-
+  const { index } = useParams();
+  const project = useSelector(
+    ({ projectsData }) => index && projectsData.projects[index]
+  );
+  useEffect(() => {
+    if (index) {
+      if (project) {
+        setTitle(project.title);
+        setDesc(project.desc);
+        setMode(MODE.EDIT);
+      } else {
+        setMode(MODE.ADD);
+      }
+    } else {
+      setMode(MODE.ADD);
+    }
+  }, [index, project]);
   const imageUploadRef = useRef(null);
   const toast = useToast();
   const dispatch = useDispatch();
@@ -51,9 +74,11 @@ const Add = () => {
     setLoading(true);
     if (!title) {
       setTitleValid(false);
-    } else if (!desc) {
+    } else if (!desc || desc.length <= 150) {
       setDescValid(false);
     } else {
+      setTitleValid(true);
+      setDescValid(true);
       try {
         const imagesTask = await Promise.all(
           images.map((image) =>
@@ -97,6 +122,7 @@ const Add = () => {
             <Input
               name="project"
               id="project"
+              value={title}
               placeholder="Enter your Project title"
               errorBorderColor="red.300"
               onChange={(e) => setTitle(e.target.value)}
@@ -109,13 +135,15 @@ const Add = () => {
             <Textarea
               id="desc"
               name="desc"
+              height="300px"
+              value={desc}
               errorBorderColor="red.300"
               placeholder="Enter your project description here."
               onChange={(e) => setDesc(e.target.value)}
               isRequired
             />
             <FormErrorMessage>
-              Project Description cannot be Empty
+              Project Description needs to be a minimum of 150 characters
             </FormErrorMessage>
           </FormControl>
           <Heading size="l" mt="5" mb="3">
@@ -137,7 +165,7 @@ const Add = () => {
             width="100%"
             isLoading={loading}
           >
-            Add new project.
+            {mode === MODE.EDIT ? "Update Project" : "Add a Project"}
           </Button>
         </Form>
         <Heading size="l" mt="5" mb="3">
