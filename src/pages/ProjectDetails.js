@@ -6,6 +6,7 @@ import {
   Image,
   IconButton,
   HStack,
+  Button,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -17,12 +18,13 @@ const ProjectDetails = () => {
   const project = useSelector(
     ({ projectsData }) => projectsData.projects[index]
   );
-
   if (!project) {
     return (
       <>
         <h1>Aww snap</h1>
-        <Link to="/" replace />
+        <Link to="/" replace>
+          <Button>GO BACK!!</Button>
+        </Link>
       </>
     );
   }
