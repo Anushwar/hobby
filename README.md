@@ -8,7 +8,7 @@ In the project user can:
 1. Create a new project by clicking on the '+' card on the home page. User will be redirected to the Add page where the user can enter details of the project.
 2. Once a new project is added, A card will be displayed on the home page displaying it's data.
 3. On click of the card, user will be redirected to the Details page where the details of the project card will be displayed in details.
-4. User can edit changed into the created project.Edited changes will be reflected on the card.
+4. User can edit changes into the created project. Edited changes will be reflected on the card.
 5. User can delete the created project. It will then be removed from the card.
 
 (Also added a icon on top of the Navigation bar that can toggle the theme to light/dark mode).
